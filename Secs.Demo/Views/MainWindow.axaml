@@ -1,0 +1,157 @@
+<Window x:Class="Secs.Demo.Views.MainWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:conv="using:Secs.Demo.Converters"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="using:Secs.Demo.Views"
+        xmlns:vm="using:Secs.Demo.ViewModels"
+        Title="Secs.Demo"
+        d:DesignHeight="450"
+        d:DesignWidth="800"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+
+    <Grid Margin="5" RowDefinitions="auto,*">
+        <StackPanel Margin="0,0,0,5"
+                    Orientation="Horizontal"
+                    Spacing="5">
+            <Menu>
+                <MenuItem Header="_Setting">
+                    <MenuItem Command="{Binding ConfigCommand}" Header="Config" />
+                    <MenuItem Command="{Binding StartCommand}"
+                              Header="Start"
+                              IsEnabled="{Binding !IsStart}" />
+                    <MenuItem Command="{Binding StopCommand}"
+                              Header="Stop"
+                              IsEnabled="{Binding IsStart}" />
+                </MenuItem>
+                <MenuItem Header="_SML">
+                    <MenuItem Command="{Binding LoadSmlCommand}" Header="Load Sml" />
+                    <MenuItem Command="{Binding AddSmlCommand}" Header="Add Sml" />
+                    <MenuItem Command="{Binding SendSmlCommand}" Header="Send Sml" />
+                </MenuItem>
+            </Menu>
+        </StackPanel>
+        <Grid Grid.Row="1" ColumnDefinitions="auto,*">
+            <Grid RowDefinitions="auto,auto,*,auto,*">
+                <StackPanel Spacing="5">
+                    <TextBox Width="300"
+                             IsReadOnly="True"
+                             Text="{Binding ConnectionModeText}">
+                        <TextBox.InnerLeftContent>
+                            <TextBlock Classes="innerLeftContentTextBlock" Text="ConnectionMode:" />
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+                    <TextBox Width="300"
+                             IsReadOnly="True"
+                             Text="{Binding IsStart}">
+                        <TextBox.InnerLeftContent>
+                            <TextBlock Classes="innerLeftContentTextBlock" Text="IsStart:" />
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+                    <TextBox Width="300"
+                             IsReadOnly="True"
+                             Text="{Binding LocalEP}">
+                        <TextBox.InnerLeftContent>
+                            <TextBlock Classes="innerLeftContentTextBlock" Text="LocalEP:" />
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+                    <TextBox Width="300"
+                             InnerLeftContent="RemoteEP"
+                             IsReadOnly="True"
+                             Text="{Binding RemoteEP}">
+                        <TextBox.InnerLeftContent>
+                            <TextBlock Classes="innerLeftContentTextBlock" Text="RemoteEP:" />
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+                    <TextBox Width="300"
+                             InnerLeftContent="IsConnect"
+                             IsReadOnly="True"
+                             Text="{Binding IsConnect}">
+                        <TextBox.InnerLeftContent>
+                            <TextBlock Classes="innerLeftContentTextBlock" Text="IsConnect:" />
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+                    <TextBox Width="300"
+                             InnerLeftContent="ConnectionState"
+                             IsReadOnly="True"
+                             Text="{Binding ConnectionStateText}">
+                        <TextBox.InnerLeftContent>
+                            <TextBlock Classes="innerLeftContentTextBlock" Text="ConnectionState:" />
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+					<TextBox Width="300"
+							InnerLeftContent="ConnectionState"
+							IsReadOnly="True"
+							Text="{Binding PrimaryContextCount}">
+						<TextBox.InnerLeftContent>
+							<TextBlock Classes="innerLeftContentTextBlock" Text="PrimaryContextCount:" />
+						</TextBox.InnerLeftContent>
+					</TextBox>
+					<TextBox Width="300"
+							InnerLeftContent="ConnectionState"
+							IsReadOnly="True"
+							Text="{Binding SecondaryContextCount}">
+						<TextBox.InnerLeftContent>
+							<TextBlock Classes="innerLeftContentTextBlock" Text="SecondaryContextCount:" />
+						</TextBox.InnerLeftContent>
+					</TextBox>
+                </StackPanel>
+                <TextBlock Grid.Row="1"
+                           Margin="0,5,0,0"
+                           Text="TX" />
+                <TextBox Grid.Row="2"
+                         Width="300"
+                         MinHeight="100"
+                         Padding="5"
+                         VerticalAlignment="Stretch"
+                         VerticalContentAlignment="Top"
+                         IsReadOnly="True"
+                         Text="{Binding SendData}"
+                         TextWrapping="Wrap" />
+                <TextBlock Grid.Row="3"
+                           Margin="0,5,0,0"
+                           Text="RX" />
+                <TextBox Grid.Row="4"
+                         Width="300"
+                         MinHeight="100"
+                         Padding="5"
+                         VerticalAlignment="Stretch"
+                         VerticalContentAlignment="Top"
+                         IsReadOnly="True"
+                         Text="{Binding ReceiveData}"
+                         TextWrapping="Wrap" />
+            </Grid>
+
+            <Grid Grid.Column="1"
+                  Margin="5,0,0,0"
+                  RowDefinitions="*,*">
+                <TextBox Padding="5"
+                         VerticalAlignment="Stretch"
+                         VerticalContentAlignment="Top"
+                         IsReadOnly="True"
+                         Text="{Binding HsmsDataContextText}"
+                         TextWrapping="Wrap" />
+                <TextBox Grid.Row="1"
+                         Margin="0,5,0,0"
+                         Padding="5"
+                         VerticalAlignment="Stretch"
+                         VerticalContentAlignment="Top"
+                         IsReadOnly="True"
+                         Text="{Binding HsmsMessageText}"
+                         TextWrapping="Wrap" />
+            </Grid>
+        </Grid>
+
+
+
+    </Grid>
+</Window>

@@ -1,0 +1,26 @@
+<Application x:Class="Secs.Demo.App"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:Secs.Demo.Converters"
+             xmlns:local="using:Secs.Demo"
+             RequestedThemeVariant="Default">
+
+    <Application.Resources>
+        <conv:MultiValueConverter x:Key="MultiValueConverter" />
+    </Application.Resources>
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+
+        <Style Selector="ListBoxItem">
+            <Setter Property="Height" Value="25" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+
+        <Style Selector="TextBlock.innerLeftContentTextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="5 0 0 0" />
+        </Style>
+
+    </Application.Styles>
+</Application>

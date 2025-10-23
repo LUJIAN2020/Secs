@@ -1,0 +1,86 @@
+<Window x:Class="Secs.Demo.Views.SmlSendWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:AvalonEdit="using:AvaloniaEdit"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:Secs.Demo.ViewModels"
+        Title="Sml"
+        Width="800"
+        Height="600"
+        Padding="5"
+        d:DesignHeight="600"
+        d:DesignWidth="590"
+        x:DataType="vm:SmlSendWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        WindowStartupLocation="CenterOwner"
+        mc:Ignorable="d">
+
+    <Grid ColumnDefinitions="200,*">
+        <ListBox x:Name="listbox"
+                 ItemsSource="{Binding SmlItems}"
+                 SelectedItem="{Binding SelectedSmlItem}"
+                 SelectionMode="Multiple">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Margin="5,4,5,0" Text="{Binding Name}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <Grid Grid.Column="1"
+              Margin="5,0,5,5"
+              RowDefinitions="auto,*">
+            <StackPanel Spacing="5">
+                <TextBox Text="{Binding SelectedSmlItem.Name}">
+                    <TextBox.InnerLeftContent>
+                        <TextBlock Classes="innerLeftContentTextBlock" Text="Name:" />
+                    </TextBox.InnerLeftContent>
+                </TextBox>
+
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <NumericUpDown Width="150"
+                                   Increment="1"
+                                   Maximum="255"
+                                   Minimum="0"
+                                   Value="{Binding SelectedSmlItem.Stream}">
+                        <NumericUpDown.InnerLeftContent>
+                            <TextBlock Classes="innerLeftContentTextBlock" Text="S:" />
+                        </NumericUpDown.InnerLeftContent>
+                    </NumericUpDown>
+                    <NumericUpDown Width="150"
+                                   Increment="1"
+                                   Maximum="255"
+                                   Minimum="0"
+                                   Value="{Binding SelectedSmlItem.Function}">
+                        <NumericUpDown.InnerLeftContent>
+                            <TextBlock Classes="innerLeftContentTextBlock" Text="F:" />
+                        </NumericUpDown.InnerLeftContent>
+                    </NumericUpDown>
+                    <CheckBox Content="Reply" IsChecked="{Binding SelectedSmlItem.IsReply}" />
+
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <Button Command="{Binding SendCommand}" Content="Send" />
+                    <Button Command="{Binding SaveCommand}" Content="Save" />
+                    <Button Command="{Binding AddCommand}" Content="Add" />
+                    <Button Command="{Binding RemoveCommand}"
+                            CommandParameter="{Binding #listbox.SelectedItems}"
+                            Content="Remove" />
+                </StackPanel>
+
+            </StackPanel>
+
+            <AvalonEdit:TextEditor Name="Editor"
+                                   Grid.Row="1"
+                                   Margin="0,5,0,0"
+                                   Document="{Binding SmlDocument}"
+                                   FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
+                                   FontSize="14"
+                                   FontWeight="Light"
+                                   HorizontalScrollBarVisibility="Auto"
+                                   ShowLineNumbers="True"
+                                   VerticalScrollBarVisibility="Visible" />
+        </Grid>
+    </Grid>
+</Window>

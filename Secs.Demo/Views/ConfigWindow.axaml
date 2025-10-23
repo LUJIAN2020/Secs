@@ -1,0 +1,115 @@
+<Window x:Class="Secs.Demo.Views.ConfigWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:Secs.Demo.ViewModels"
+        Title="Config"
+        Width="400"
+        Height="300"
+        Padding="5"
+        d:DesignHeight="300"
+        d:DesignWidth="400"
+        x:DataType="vm:ConfigWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        WindowStartupLocation="CenterOwner"
+        mc:Ignorable="d">
+
+    <Grid Margin="5" RowDefinitions="*,auto">
+
+        <Grid ColumnDefinitions="*,*">
+
+            <Grid Margin="0,0,2.5,0" RowDefinitions="auto,*,*">
+                <StackPanel>
+                    <TextBlock Text="Role" />
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <RadioButton Content="Passive" IsChecked="{Binding Config.PassiveIsChecked}" />
+                        <RadioButton Content="Active" IsChecked="{Binding Config.ActiveIsChecked}" />
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Spacing="5">
+                    <TextBlock Text="Remote" />
+                    <StackPanel Spacing="5">
+                        <TextBox Text="{Binding Config.RemoteIP}">
+                            <TextBox.InnerLeftContent>
+                                <TextBlock Classes="innerLeftContentTextBlock" Text="IP:" />
+                            </TextBox.InnerLeftContent>
+                        </TextBox>
+                        <TextBox Text="{Binding Config.RemotePort}">
+                            <TextBox.InnerLeftContent>
+                                <TextBlock Classes="innerLeftContentTextBlock" Text="Port:" />
+                            </TextBox.InnerLeftContent>
+                        </TextBox>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Spacing="5">
+                    <TextBlock Text="Local" />
+                    <StackPanel Spacing="5">
+                        <TextBox Text="{Binding Config.LocalIP}">
+                            <TextBox.InnerLeftContent>
+                                <TextBlock Classes="innerLeftContentTextBlock" Text="IP:" />
+                            </TextBox.InnerLeftContent>
+                        </TextBox>
+                        <TextBox InnerLeftContent="Port" Text="{Binding Config.LocalPort}">
+                            <TextBox.InnerLeftContent>
+                                <TextBlock Classes="innerLeftContentTextBlock" Text="Port:" />
+                            </TextBox.InnerLeftContent>
+                        </TextBox>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Grid.Column="1"
+                        Margin="2.5,0,0,0"
+                        Spacing="5">
+                <NumericUpDown Value="{Binding Config.Device}">
+                    <NumericUpDown.InnerLeftContent>
+                        <TextBlock Classes="innerLeftContentTextBlock" Text="Device:" />
+                    </NumericUpDown.InnerLeftContent>
+                </NumericUpDown>
+                <NumericUpDown Value="{Binding Config.T3}">
+                    <NumericUpDown.InnerLeftContent>
+                        <TextBlock Classes="innerLeftContentTextBlock" Text="T3:" />
+                    </NumericUpDown.InnerLeftContent>
+                </NumericUpDown>
+                <NumericUpDown Value="{Binding Config.T5}">
+                    <NumericUpDown.InnerLeftContent>
+                        <TextBlock Classes="innerLeftContentTextBlock" Text="T5:" />
+                    </NumericUpDown.InnerLeftContent>
+                </NumericUpDown>
+                <NumericUpDown Value="{Binding Config.T6}">
+                    <NumericUpDown.InnerLeftContent>
+                        <TextBlock Classes="innerLeftContentTextBlock" Text="T6:" />
+                    </NumericUpDown.InnerLeftContent>
+                </NumericUpDown>
+                <NumericUpDown Value="{Binding Config.T7}">
+                    <NumericUpDown.InnerLeftContent>
+                        <TextBlock Classes="innerLeftContentTextBlock" Text="T7:" />
+                    </NumericUpDown.InnerLeftContent>
+                </NumericUpDown>
+                <NumericUpDown Value="{Binding Config.T8}">
+                    <NumericUpDown.InnerLeftContent>
+                        <TextBlock Classes="innerLeftContentTextBlock" Text="T8:" />
+                    </NumericUpDown.InnerLeftContent>
+                </NumericUpDown>
+            </StackPanel>
+
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,*">
+            <Button Margin="0,0,2.5,0"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    Command="{Binding OkCommand}"
+                    Content="OK" />
+            <Button Grid.Column="1"
+                    Margin="2.5,0,0,0"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
+                    Command="{Binding CancelCommand}"
+                    Content="Cancel" />
+        </Grid>
+
+    </Grid>
+
+</Window>

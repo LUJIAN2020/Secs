@@ -1,5 +1,7 @@
 ## SECS Introduction
 
+[中文](./README_CN.md)
+
 The Secs library implements HSMS, which defines the communication interface when using TCP/IP as the physical transmission medium.
 It leverages TCP/IP stream support to provide reliable, bidirectional, and synchronous communication. For communication between EAP and EQP.
 Both Active and Passive modes are supported:

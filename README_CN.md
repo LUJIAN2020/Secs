@@ -1,6 +1,6 @@
 ## SECS 介绍
 
-Secs库实现了HSMS，HSMS定义了使用 TCP/IP 作为物理传输媒质时的通信接口，使用TCP/IP流支持，提供了可靠的双向同步传输。
+Secs库实现了HSMS，HSMS定义了使用 TCP/IP 作为物理传输媒质时的通信接口，使用TCP/IP流支持，提供了可靠的双向同步传输。可用于EAP与EQP之间的通信。
 支持Active和Passive模式
 - Active（Client端）时主动连接远端服务器
 - Passive（Server端）时监听远端的客户端连接

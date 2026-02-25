@@ -126,7 +126,7 @@ public delegate void HsmsMessageChanged(HsmsMessage hsmsMessage);
 ```
 
 - **ConnectionStateChangedHandler**
-```
+```C#
 /// <summary>
 /// connection state changed
 /// </summary>

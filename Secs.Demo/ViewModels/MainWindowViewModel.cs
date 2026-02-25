@@ -57,13 +57,13 @@ namespace Secs.Demo.ViewModels
                 ConnectionModeText = options.ConnectionMode.ToString();
                 server = new HsmsServer(options)
                 {
-                    InternalException = OnInternalException,
-                    RawMessageChanged = OnRawMessageChanged,
-                    HsmsDataContextChanged = OnHsmsDataContextChanged,
-                    HsmsMessageChanged = OnHsmsMessageChanged,
-                    SessionConnectionChanged = OnSessionConnectionChanged,
-                    SubscribeRemoteCaller = OnSubscribeRemoteCaller,
-                    ConnectionStateChanged = OnConnectionStateChanged
+                    InternalExceptionHandler = OnInternalException,
+                    RawMessageChangedHandler = OnRawMessageChanged,
+                    HsmsDataContextChangedHandler = OnHsmsDataContextChanged,
+                    HsmsMessageChangedHandler = OnHsmsMessageChanged,
+                    SessionConnectionChangedHandler = OnSessionConnectionChanged,
+                    SubscribeRemoteCallerHandler = OnSubscribeRemoteCaller,
+                    ConnectionStateChangedHandler = OnConnectionStateChanged
                 };
                 server.Start();
                 IsStart = true;
@@ -209,7 +209,7 @@ namespace Secs.Demo.ViewModels
                 }
             }
         }
-        private void OnInternalException(string? msg, Exception ex)
+        private void OnInternalException(string msg, Exception ex)
         {
             log.Error(ex, msg);
             notificationService.ShowError(msg + ex.Message, nameof(MainWindow));

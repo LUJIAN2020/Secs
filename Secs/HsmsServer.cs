@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -41,7 +40,7 @@ namespace Secs
             {
                 if (value != connectionState)
                 {
-                    ConnectionStateChanged?.Invoke(value);
+                    ConnectionStateChangedHandler?.Invoke(value);
                 }
                 connectionState = value;
             }
@@ -62,31 +61,31 @@ namespace Secs
         /// <summary>
         /// Connection session changed
         /// </summary>
-        public Action<EndPoint?, EndPoint?, bool>? SessionConnectionChanged;
+        public SessionConnectionChanged? SessionConnectionChangedHandler;
         /// <summary>
         /// Internal exception
         /// </summary>
-        public Action<string?, Exception>? InternalException;
+        public InternalException? InternalExceptionHandler;
         /// <summary>
         /// Record send or receive raw message
         /// </summary>
-        public Action<byte[], RawType>? RawMessageChanged;
+        public RawMessageChanged? RawMessageChangedHandler;
         /// <summary>
         /// Hsms data context changed
         /// </summary>
-        public Action<HsmsDataContext>? HsmsDataContextChanged;
+        public HsmsDataContextChanged? HsmsDataContextChangedHandler;
         /// <summary>
         /// Record send or receive hsms message
         /// </summary>
-        public Action<HsmsMessage>? HsmsMessageChanged;
+        public HsmsMessageChanged? HsmsMessageChangedHandler;
         /// <summary>
         /// connection state changed
         /// </summary>
-        public Action<ConnectionState>? ConnectionStateChanged;
+        public ConnectionStateChanged? ConnectionStateChangedHandler;
         /// <summary>
         /// Subscribe passive remote caller hsms message
         /// </summary>
-        public Func<HsmsMessage, HsmsMessage?>? SubscribeRemoteCaller;
+        public SubscribeRemoteCaller? SubscribeRemoteCallerHandler;
         public HsmsServer(HsmsOptions options)
         {
             Options = options;
@@ -125,7 +124,7 @@ namespace Secs
             LocalEndPoint = _callerSocket.LocalEndPoint;
             RemoteEndPoint = _callerSocket.RemoteEndPoint;
             ConnectionState = ConnectionState.Connected;
-            SessionConnectionChanged?.Invoke(LocalEndPoint, RemoteEndPoint, true);
+            SessionConnectionChangedHandler?.Invoke(LocalEndPoint, RemoteEndPoint, true);
             ConnectionState = ConnectionState.NotSelected;
 
             Task.Run(LoopReceiveAsync);
@@ -153,7 +152,7 @@ namespace Secs
                 _loopProcessSecondaryContextsTokenSource.Destroy();
                 _callerSocket.SafeClose();
                 ConnectionState = ConnectionState.NotConnected;
-                SessionConnectionChanged?.Invoke(LocalEndPoint, RemoteEndPoint, false);
+                SessionConnectionChangedHandler?.Invoke(LocalEndPoint, RemoteEndPoint, false);
             }
             finally
             {
@@ -182,7 +181,7 @@ namespace Secs
                 _server.SafeClose();
                 _callerSocket.SafeClose();
                 ConnectionState = ConnectionState.NotConnected;
-                SessionConnectionChanged?.Invoke(LocalEndPoint, RemoteEndPoint, false);
+                SessionConnectionChangedHandler?.Invoke(LocalEndPoint, RemoteEndPoint, false);
             }
             finally
             {
@@ -209,28 +208,28 @@ namespace Secs
                             ConnectionState = ConnectionState.Connected;
                             LocalEndPoint = client.LocalEndPoint;
                             RemoteEndPoint = client.RemoteEndPoint;
-                            SessionConnectionChanged?.Invoke(LocalEndPoint, RemoteEndPoint, true);
+                            SessionConnectionChangedHandler?.Invoke(LocalEndPoint, RemoteEndPoint, true);
                             _callerSocket = client;
                             await LoopReceiveAsync();
-                            SessionConnectionChanged?.Invoke(LocalEndPoint, RemoteEndPoint, false);
+                            SessionConnectionChangedHandler?.Invoke(LocalEndPoint, RemoteEndPoint, false);
                         }
                         catch (Exception ex)
                         {
-                            InternalException?.Invoke("Accept error", ex);
+                            InternalExceptionHandler?.Invoke("Accept error", ex);
                         }
                         await Task.Delay(Options.T5, _acceptTokenSource.Token);
                     }
                 }
                 catch (Exception ex)
                 {
-                    InternalException?.Invoke("Listen error", ex);
+                    InternalExceptionHandler?.Invoke("Listen error", ex);
                 }
             });
         }
         private int Send(Socket socket, byte[] buffer)
         {
             int len = socket.Send(buffer);
-            RawMessageChanged?.Invoke(buffer, RawType.Send);
+            RawMessageChangedHandler?.Invoke(buffer, RawType.Send);
             return len;
         }
         private Task LoopSendLinkTestAsync()
@@ -257,7 +256,7 @@ namespace Secs
                     catch (Exception ex)
                     {
                         if (_loopLinkTestTokenSource.IsCancellationRequested) return;
-                        InternalException?.Invoke($"SendLinktest error, Local:{LocalEndPoint}, Remote:{RemoteEndPoint}", ex);
+                        InternalExceptionHandler?.Invoke($"SendLinktest error, Local:{LocalEndPoint}, Remote:{RemoteEndPoint}", ex);
                     }
                 }
             });
@@ -290,7 +289,7 @@ namespace Secs
 
                     int totalLength = payloadLength + 4;
                     var readData = readDataBuffer.Slice(0, totalLength);
-                    RawMessageChanged?.Invoke(readData, RawType.Receive);
+                    RawMessageChangedHandler?.Invoke(readData, RawType.Receive);
                     await AddOrUpdateDataContextAsync(readData);
                 }
                 catch (Exception ex)
@@ -300,10 +299,10 @@ namespace Secs
                     if (_callerSocket == null || !_callerSocket.Connected)
                     {
                         _loopReceiveTokenSource.Destroy();
-                        InternalException?.Invoke($"Socket disconnected, Local:{LocalEndPoint}, Remote:{RemoteEndPoint}", ex);
+                        InternalExceptionHandler?.Invoke($"Socket disconnected, Local:{LocalEndPoint}, Remote:{RemoteEndPoint}", ex);
                         return;
                     }
-                    InternalException?.Invoke($"Loop receive error, Local:{LocalEndPoint}, Remote:{RemoteEndPoint}", ex);
+                    InternalExceptionHandler?.Invoke($"Loop receive error, Local:{LocalEndPoint}, Remote:{RemoteEndPoint}", ex);
                 }
 
                 static int GetPayloadLength(byte[] buffer)
@@ -329,7 +328,7 @@ namespace Secs
             }
             finally
             {
-                HsmsMessageChanged?.Invoke(hsmsMessage);
+                HsmsMessageChangedHandler?.Invoke(hsmsMessage);
             }
         }
         private async Task AddOrUpdateControlDataContextAsync(HsmsMessage hsmsMessage, SType sType)
@@ -480,7 +479,7 @@ namespace Secs
                     {
                         if (_loopProcessSecondaryContextsTokenSource.IsCancellationRequested) return;
 
-                        InternalException?.Invoke($"Process secondary context error, Local:{LocalEndPoint}, Remote:{RemoteEndPoint}", ex);
+                        InternalExceptionHandler?.Invoke($"Process secondary context error, Local:{LocalEndPoint}, Remote:{RemoteEndPoint}", ex);
                     }
                     finally
                     {
@@ -519,7 +518,7 @@ namespace Secs
                                 ConnectionState = ConnectionState.NotSelected;
                                 Send(dataContext.Caller, rawData);
                                 ConnectionState = ConnectionState.Selected;
-                                HsmsMessageChanged?.Invoke(hsmsMsg);
+                                HsmsMessageChangedHandler?.Invoke(hsmsMsg);
                                 break;
                             }
                         case SType.DeselectReq:
@@ -537,7 +536,7 @@ namespace Secs
 
                                 Send(dataContext.Caller, rawData);
                                 ConnectionState = ConnectionState.NotSelected;
-                                HsmsMessageChanged?.Invoke(hsmsMsg);
+                                HsmsMessageChangedHandler?.Invoke(hsmsMsg);
                                 break;
                             }
                         case SType.LinktestReq:
@@ -554,7 +553,7 @@ namespace Secs
                                     throw new NullReferenceException("Caller socket is null");
 
                                 Send(dataContext.Caller, rawData);
-                                HsmsMessageChanged?.Invoke(hsmsMsg);
+                                HsmsMessageChangedHandler?.Invoke(hsmsMsg);
                                 break;
                             }
                         case SType.SeparateReq:
@@ -567,7 +566,7 @@ namespace Secs
                             }
                         case SType.DataMessage:
                             {
-                                var res = SubscribeRemoteCaller?.Invoke(rspMsg);
+                                var res = SubscribeRemoteCallerHandler?.Invoke(rspMsg);
                                 if (res != null)
                                 {
                                     var buffer = HsmsMessage.ConverterToBytes(res);
@@ -580,7 +579,7 @@ namespace Secs
                                         throw new NullReferenceException("Caller socket is null");
 
                                     Send(dataContext.Caller, buffer);
-                                    HsmsMessageChanged?.Invoke(res);
+                                    HsmsMessageChangedHandler?.Invoke(res);
                                 }
 
                                 break;
@@ -600,13 +599,13 @@ namespace Secs
             }
             catch (Exception ex)
             {
-                InternalException?.Invoke($"Execute secondary context error, DataContext:{dataContext}", ex);
+                InternalExceptionHandler?.Invoke($"Execute secondary context error, DataContext:{dataContext}", ex);
             }
             finally
             {
                 dataContext.Handled = true;
                 dataContext.HandleTimestamp = DateTime.Now;
-                HsmsDataContextChanged?.Invoke(dataContext);
+                HsmsDataContextChangedHandler?.Invoke(dataContext);
             }
         }
         private void CreateDataMessageHsmsDataContext(byte stream, byte function, HsmsBody? body, out int sb, out byte[] data)
@@ -675,7 +674,7 @@ namespace Secs
                     {
                         dataContext.Handled = true;
                         dataContext.HandleTimestamp = DateTime.Now;
-                        HsmsDataContextChanged?.Invoke(dataContext);
+                        HsmsDataContextChangedHandler?.Invoke(dataContext);
                         _primaryContext.Remove(sb);
                         ClearExpiredDataContexts(_primaryContext);
                         return rsp;

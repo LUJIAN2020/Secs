@@ -254,11 +254,9 @@ namespace Secs.Demo.ViewModels
             log.Info(msg);
             notificationService.ShowInfo(msg, nameof(MainWindow));
         }
-        private HsmsMessage OnSubscribeRemoteCaller(HsmsMessage req)
+        private HsmsMessage? OnSubscribeRemoteCaller(HsmsMessage req)
         {
-            //service code
-
-
+            //Must reply
             var rspHeader = HsmsHeader.CreateDefaultReplyHsmsHeader(req.Header);
             var body = new L
             (
@@ -270,6 +268,9 @@ namespace Secs.Demo.ViewModels
                 }
             );
             return new HsmsMessage(rspHeader, body);
+
+            //No need to reply
+            //return null
         }
         public void ConfigCommand()
         {

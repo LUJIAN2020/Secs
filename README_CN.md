@@ -48,13 +48,13 @@ var options = new HsmsOptions()
 };
 var server = new HsmsServer(options)
 {
-    InternalException = OnInternalException,
-    RawMessageChanged = OnRawMessageChanged,
-    HsmsDataContextChanged = OnHsmsDataContextChanged,
-    HsmsMessageChanged = OnHsmsMessageChanged,
-    SessionConnectionChanged = OnSessionConnectionChanged,
-    SubscribeRemoteCaller = OnSubscribeRemoteCaller,
-    ConnectionStateChanged = OnConnectionStateChanged
+    InternalExceptionHandler = OnInternalException,
+    RawMessageChangedHandler = OnRawMessageChanged,
+    HsmsDataContextChangedHandler = OnHsmsDataContextChanged,
+    HsmsMessageChangedHandler = OnHsmsMessageChanged,
+    SessionConnectionChangedHandler = OnSessionConnectionChanged,
+    SubscribeRemoteCallerHandler = OnSubscribeRemoteCaller,
+    ConnectionStateChangedHandler = OnConnectionStateChanged
 };
 server.Start();
 ```
@@ -75,32 +75,76 @@ server.Start();
 | 10 |T7                |未选择状态超时，定义当建立了 TCP/IP 连接之后通信处于 Not Selected 状态的最长时间，通信必须在该时间完成 Selected Procedure，否则将会断开 TCP/IP 连接。默认：10秒|
 | 11 |T8                |网络字符超时，定义成功接收到单个HSMS 消息的字符之间的最大时间间隔。默认：5秒|
 
-### 内部委托
-- **SessionConnectionChanged** 连接节点变化委托
-EndPoint? arg1 : 本地终结点
-EndPoint? arg2 : 远程终结点
-bool arg3 : true=连接，false=断开
+### 处理器
+- **SessionConnectionChangedHandler**
+```C#
+/// <summary>
+/// 连接节点变化处理器：当连接状态发生变化时触发，提供本地和远程端点信息以及连接状态。
+/// </summary>
+/// <param name="localEndPoint">本地节点</param>
+/// <param name="remoteEndPoint">远程节点</param>
+/// <param name="isConnected">true=连接,false=断开</param>
+public delegate void SessionConnectionChanged(EndPoint? localEndPoint, EndPoint? remoteEndPoint, bool isConnected);
+```
 
-- **InternalException** 内部异常委托
-string？ arg1 : 消息
-Exception arg2 : 异常
+- **InternalExceptionHandler**
+```C#
+/// <summary>
+/// 内部异常处理器：当库内部发生异常时触发，提供异常消息和异常实例以供调试和日志记录使用。
+/// </summary>
+/// <param name="message">消息</param>
+/// <param name="exception">异常</param>
+public delegate void InternalException(string message, Exception exception);
+```
 
-- **RawMessageChanged** 发送或接收原始数据发生变化时触发的委托
-byte[] arg1 : 传输的数据
-RawType arg2 ：发送/接收
+- **RawMessageChangedHandler**
+```C#
+/// <summary>
+/// 提供原始数据和数据类型以供调试和日志记录使用。
+/// </summary>
+/// <param name="buffer">原始数据</param>
+/// <param name="rawType">发送、接收</param>
+public delegate void RawMessageChanged(byte[] buffer, RawType rawType);
+```
 
-- **HsmsDataContextChanged** Hsms上下文变化的委托
-HsmsDataContext arg1 ：Hsms数据上下文
+- **HsmsDataContextChangedHandler**
+```C#
+/// <summary>
+/// HsmsDataContext变化处理器：当HSMS数据上下文发生变化时触发，提供新的数据上下文以供处理和响应使用。
+/// </summary>
+/// <param name="hsmsDataContext"></param>
+public delegate void HsmsDataContextChanged(HsmsDataContext hsmsDataContext);
+```
 
-- **HsmsMessageChanged** Hsms消息变化委托
-HsmsMessage arg1 : Hsms消息
+- **HsmsMessageChangedHandler**
+```C#
+/// <summary>
+/// HsmsMessage变化处理器：当HSMS消息发生变化时触发，提供新的HSMS消息以供处理和响应使用。
+/// </summary>
+/// <param name="hsmsMessage"></param>
+public delegate void HsmsMessageChanged(HsmsMessage hsmsMessage);
+```
 
-- **ConnectionStateChanged** 连接状态变化的委托
-ConnectionState arg1 : 连接状态
+- **ConnectionStateChangedHandler**
+```
+/// <summary>
+/// connection state changed
+/// </summary>
+/// <param name="connectionState"></param>
+public delegate void ConnectionStateChanged(ConnectionState connectionState);
+```
 
-- **SubscribeRemoteCaller** 订阅远程调用委托，被动接收消息，业务处理主要委托
-HsmsMessage arg1 : 远端发送的Hsms消息
-HsmsMessage arg2 : 本地回复远端的Hsms消息
+- **SubscribeRemoteCallerHandler**
+```C#
+/// <summary>
+/// Subscribe Remote Invocation Delegate: 
+/// A delegate used to passively receive messages from a remote entity. 
+/// It serves as the primary delegate for handling business logic.
+/// </summary>
+/// <param name="hsmsMessage"></param>
+/// <returns>A reply that is not mandatory can be left blank</returns>
+public delegate HsmsMessage? SubscribeRemoteCaller(HsmsMessage hsmsMessage);
+```
 
 ### 发送消息
 ```C#
@@ -251,4 +295,26 @@ var rsp = server.SendRejectRsp();
 //发送Separate.req
 server.SendSeparateReq();
 
+```
+
+### 订阅远程调用
+```C#
+private HsmsMessage? OnSubscribeRemoteCaller(HsmsMessage req)
+{
+    //Must reply
+    var rspHeader = HsmsHeader.CreateDefaultReplyHsmsHeader(req.Header);
+    var body = new L
+    (
+        "Response",
+        new HsmsBody[]
+        {
+            new U1(0, "ErrorCode"),
+            new A("Success", "Message"),
+        }
+    );
+    return new HsmsMessage(rspHeader, body);
+
+    //No need to reply
+    //return null
+}
 ```

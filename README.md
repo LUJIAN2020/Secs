@@ -53,13 +53,13 @@ var options = new HsmsOptions()
 };
 var server = new HsmsServer(options)
 {
-    InternalException = OnInternalException,
-    RawMessageChanged = OnRawMessageChanged,
-    HsmsDataContextChanged = OnHsmsDataContextChanged,
-    HsmsMessageChanged = OnHsmsMessageChanged,
-    SessionConnectionChanged = OnSessionConnectionChanged,
-    SubscribeRemoteCaller = OnSubscribeRemoteCaller,
-    ConnectionStateChanged = OnConnectionStateChanged
+    InternalExceptionHandler = OnInternalException,
+    RawMessageChangedHandler = OnRawMessageChanged,
+    HsmsDataContextChangedHandler = OnHsmsDataContextChanged,
+    HsmsMessageChangedHandler = OnHsmsMessageChanged,
+    SessionConnectionChangedHandler = OnSessionConnectionChanged,
+    SubscribeRemoteCallerHandler = OnSubscribeRemoteCaller,
+    ConnectionStateChangedHandler = OnConnectionStateChanged
 };
 server.Start();
 ```
@@ -80,32 +80,76 @@ server.Start();
 | 10 |T7                |Not Selected Timeout:Defines the maximum duration the communication can remain in the Not Selected state after a TCP/IP connection is established.The communication must complete the Selected Procedure within this time, otherwise the TCP/IP connection will be disconnected.Default: 10 seconds.|
 | 11 |T8                |Network Character Timeout:Defines the maximum time interval between characters when successfully receiving a single HSMS message.Default: 5 seconds.|
 
-### Subscribe Message
-- **SessionConnectionChanged** Connection Node Changed Delegate
-EndPoint? arg1 : Local EndPoint
-EndPoint? arg2 : Remote EndPoint
-bool arg3 : true = connect, false = disconnect.
+### Handler
+- **SessionConnectionChangedHandler**
+```C#
+/// <summary>
+/// Connection session changed
+/// </summary>
+/// <param name="localEndPoint">local endpoint</param>
+/// <param name="remoteEndPoint">remote endpoint</param>
+/// <param name="isConnected">true=connected,false=disconnect</param>
+public delegate void SessionConnectionChanged(EndPoint? localEndPoint, EndPoint? remoteEndPoint, bool isConnected);
+```
 
-- **InternalException** Internal Exception Delegate
-string？ arg1 : Message
-Exception arg2 : Exception
+- **InternalExceptionHandler**
+```C#
+/// <summary>
+/// Internal exception
+/// </summary>
+/// <param name="message">exception message</param>
+/// <param name="exception">exception instance</param>
+public delegate void InternalException(string message, Exception exception);
+```
 
-- **RawMessageChanged** Delegate triggered when raw data is sent or received
-byte[] arg1 : Transmitted Data
-RawType arg2 ：sent or received
+- **RawMessageChangedHandler**
+```C#
+/// <summary>
+/// Record send or receive raw message
+/// </summary>
+/// <param name="buffer">raw data</param>
+/// <param name="rawType">send or receive</param>
+public delegate void RawMessageChanged(byte[] buffer, RawType rawType);
+```
 
-- **HsmsDataContextChanged** HSMS Context Changed Delegate
-HsmsDataContext arg1 ：Hsms data context
+- **HsmsDataContextChangedHandler**
+```C#
+/// <summary>
+/// Hsms data context changed
+/// </summary>
+/// <param name="hsmsDataContext"></param>
+public delegate void HsmsDataContextChanged(HsmsDataContext hsmsDataContext);
+```
 
-- **HsmsMessageChanged** HSMS Message Changed Delegate
-HsmsMessage arg1 : Hsms Message
+- **HsmsMessageChangedHandler**
+```C#
+/// <summary>
+/// Record send or receive hsms message
+/// </summary>
+/// <param name="hsmsMessage"></param>
+public delegate void HsmsMessageChanged(HsmsMessage hsmsMessage);
+```
 
-- **ConnectionStateChanged** Connection Status Changed Delegate
-ConnectionState arg1 : ConnectionState
+- **ConnectionStateChangedHandler**
+```
+/// <summary>
+/// connection state changed
+/// </summary>
+/// <param name="connectionState"></param>
+public delegate void ConnectionStateChanged(ConnectionState connectionState);
+```
 
-- **SubscribeRemoteCaller** Subscribe Remote Invocation Delegate: A delegate used to passively receive messages from a remote entity. It serves as the primary delegate for handling business logic.
-HsmsMessage arg1 : HSMS Message Sent from Remote
-HsmsMessage arg2 : HSMS Message Response to Remote
+- **SubscribeRemoteCallerHandler**
+```C#
+/// <summary>
+/// Subscribe Remote Invocation Delegate: 
+/// A delegate used to passively receive messages from a remote entity. 
+/// It serves as the primary delegate for handling business logic.
+/// </summary>
+/// <param name="hsmsMessage"></param>
+/// <returns>A reply that is not mandatory can be left blank</returns>
+public delegate HsmsMessage? SubscribeRemoteCaller(HsmsMessage hsmsMessage);
+```
 
 ### Send Message
 ```C#
@@ -256,4 +300,26 @@ var rsp = server.SendRejectRsp();
 //Send Separate.req
 server.SendSeparateReq();
 
+```
+
+### Subscribe Remote Caller
+```C#
+private HsmsMessage? OnSubscribeRemoteCaller(HsmsMessage req)
+{
+    //Must reply
+    var rspHeader = HsmsHeader.CreateDefaultReplyHsmsHeader(req.Header);
+    var body = new L
+    (
+        "Response",
+        new HsmsBody[]
+        {
+            new U1(0, "ErrorCode"),
+            new A("Success", "Message"),
+        }
+    );
+    return new HsmsMessage(rspHeader, body);
+
+    //No need to reply
+    //return null
+}
 ```

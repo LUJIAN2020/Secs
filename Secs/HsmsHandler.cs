@@ -40,7 +40,9 @@ namespace Secs
     /// <param name="connectionState"></param>
     public delegate void ConnectionStateChanged(ConnectionState connectionState);
     /// <summary>
-    /// Subscribe passive remote caller hsms message
+    /// Subscribe Remote Invocation Delegate: 
+    /// A delegate used to passively receive messages from a remote entity. 
+    /// It serves as the primary delegate for handling business logic.
     /// </summary>
     /// <param name="hsmsMessage"></param>
     /// <returns>A reply that is not mandatory can be left blank</returns>

@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using System;
 
 namespace Secs.Demo
@@ -16,6 +16,9 @@ namespace Secs.Demo
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
+#if DEBUG
+                .WithDeveloperTools()
+#endif
                 .WithInterFont()
                 .LogToTrace();
     }

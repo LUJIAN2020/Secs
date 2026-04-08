@@ -10,7 +10,6 @@
     </Application.Resources>
     <Application.Styles>
         <FluentTheme />
-        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
 
         <Style Selector="ListBoxItem">
             <Setter Property="Height" Value="25" />

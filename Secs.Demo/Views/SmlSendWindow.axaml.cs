@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using AvaloniaEdit;
 using Secs.Demo.Services;
 using Secs.Demo.ViewModels;
 
@@ -12,16 +11,7 @@ public partial class SmlSendWindow : Window
     {
         InitializeComponent();
         DataContext = App.GetService<SmlSendWindowViewModel>();
-        var _textEditor = this.FindControl<TextEditor>("Editor");
-        if (_textEditor != null)
-        {
-            _textEditor.HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Visible;
-            _textEditor.Options.HighlightCurrentLine = true;
-            _textEditor.Options.ShowSpaces = true;
-        }
-
         Closed += SmlSendWindow_Closed;
-
     }
     private void SmlSendWindow_Closed(object? sender, System.EventArgs e)
     {

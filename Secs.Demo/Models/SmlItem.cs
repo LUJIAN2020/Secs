@@ -1,14 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 
 namespace Secs.Demo.Models
 {
     public partial class SmlItem : ObservableObject
     {
-        public SmlItem()
-        {
-
-        }
+        public SmlItem() { }
         public SmlItem(string content)
         {
             if (string.IsNullOrWhiteSpace(content)) return;
@@ -16,33 +13,43 @@ namespace Secs.Demo.Models
             var rows = content.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
             if (rows.Length > 1)
             {
-                var cols = rows[0].Split(" ", StringSplitOptions.RemoveEmptyEntries);
-                if (cols.Length >= 2)
+                var cols = rows[0].Split(":", StringSplitOptions.RemoveEmptyEntries);
+                if (cols.Length >= 1)
                 {
                     Name = cols[0];
-                    var sf = cols[1].Replace("S", "").Split("F", StringSplitOptions.RemoveEmptyEntries);
-                    if (sf.Length == 2)
+                    if (cols.Length > 1)
                     {
-                        if (byte.TryParse(sf[0], out var s))
+                        var clos1 = cols[1].Split(" ", StringSplitOptions.RemoveEmptyEntries);
+                        if (clos1.Length >= 1)
                         {
-                            Stream = s;
+                            var sf = clos1[0].Replace("'", "").Replace("S", "").Split("F", StringSplitOptions.RemoveEmptyEntries);
+                            if (sf.Length == 2)
+                            {
+                                if (byte.TryParse(sf[0], out var s))
+                                {
+                                    Stream = s;
+                                }
+                                if (byte.TryParse(sf[1], out var f))
+                                {
+                                    Function = f;
+                                }
+                            }
+                            if (clos1.Length > 1)
+                            {
+                                if (clos1[1] == "W")
+                                {
+                                    IsReply = true;
+                                }
+                                else
+                                {
+                                    IsReply = false;
+                                }
+                            }
                         }
-                        if (byte.TryParse(sf[1], out var f))
-                        {
-                            Function = f;
-                        }
                     }
-
-                    if (cols.Length == 3 && cols[2] == "W")
-                    {
-                        IsReply = true;
-                    }
-                    else
-                    {
-                        IsReply = false;
-                    }
-                    Sml = content.Substring(rows[0].Length + 2).Trim();
                 }
+                string sml = content.Substring(rows[0].Length + 2).Trim();
+                Sml = sml.Remove(sml.Length - 1, 1);
             }
         }
         [ObservableProperty] private string sml = string.Empty;

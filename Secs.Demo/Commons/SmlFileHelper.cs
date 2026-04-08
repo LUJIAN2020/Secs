@@ -1,4 +1,4 @@
-﻿using Secs.Demo.Models;
+using Secs.Demo.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,7 +18,7 @@ namespace Secs.Demo.Commons
             for (int i = 0; i < lines.Length; i++)
             {
                 totalLength += lines[i].Length;
-                if (lines[i] == ".")
+                if (lines[i] == ">.")
                 {
                     string sml = content.Substring(offset, totalLength);
                     smlItems.Add(new SmlItem(sml));
@@ -34,7 +34,7 @@ namespace Secs.Demo.Commons
             for (int i = 0; i < lines.Length; i++)
             {
                 sb.AppendLine(lines[i]);
-                if (lines[i] == ".")
+                if (lines[i] == ">.")
                 {
                     string sml = sb.ToString();
                     smlItems.Add(new SmlItem(sml));
@@ -48,16 +48,19 @@ namespace Secs.Demo.Commons
             var sb = new StringBuilder();
             foreach (var item in items)
             {
-                sb.Append($"{item.Name} S{item.Stream}F{item.Function}");
-                if (item.IsReply)
+                if (!string.IsNullOrWhiteSpace(item.Sml))
                 {
-                    sb.Append(" W\r\n");
+                    sb.Append($"{item.Name}:'S{item.Stream}F{item.Function}'");
+                    if (item.IsReply)
+                    {
+                        sb.Append(" W\r\n");
+                    }
+                    else
+                    {
+                        sb.Append("\r\n");
+                    }
+                    sb.Append(item.Sml).Append(".\r\n\r\n");
                 }
-                else
-                {
-                    sb.Append("\r\n");
-                }
-                sb.Append(item.Sml).Append("\r\n").Append(".");
             }
             File.WriteAllText(path, sb.ToString(), Encoding.UTF8);
         }

@@ -1,10 +1,9 @@
-﻿using AvaloniaEdit.Document;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Secs.Messages;
 using Secs.Demo.Commons;
 using Secs.Demo.Models;
 using Secs.Demo.Services;
 using Secs.Demo.Views;
+using Secs.Messages;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,29 +18,7 @@ namespace Secs.Demo.ViewModels
         public Action<byte, byte, HsmsBody>? SendHandler;
         public string FilePath { get; set; } = string.Empty;
         [ObservableProperty] private ObservableCollection<SmlItem> smlItems = new();
-        [ObservableProperty] private TextDocument smlDocument = new();
-        private string? provSmlItemName;
-
-        private SmlItem? selectedSmlItem;
-        public SmlItem? SelectedSmlItem
-        {
-            get { return selectedSmlItem; }
-            set
-            {
-                provSmlItemName = SelectedSmlItem?.Name;
-                if (SetProperty(ref selectedSmlItem, value))
-                {
-                    foreach (var item in SmlItems)
-                    {
-                        if (item.Name == provSmlItemName)
-                        {
-                            item.Sml = SmlDocument.Text;
-                        }
-                    }
-                    SmlDocument = new TextDocument(value?.Sml ?? string.Empty);
-                }
-            }
-        }
+        [ObservableProperty] private SmlItem? selectedSmlItem;
 
         public void SendCommand()
         {
@@ -70,16 +47,14 @@ namespace Secs.Demo.ViewModels
                         throw new Exception($"There are identical terms `{group.Key}`");
                 }
 
-                if (SelectedSmlItem != null)
+                for (int i = SmlItems.Count - 1; i >= 0; i--)
                 {
-                    foreach (var item in SmlItems)
+                    if (string.IsNullOrWhiteSpace(SmlItems[i].Name) || string.IsNullOrWhiteSpace(SmlItems[i].Sml))
                     {
-                        if (item.Name == SelectedSmlItem.Name)
-                        {
-                            item.Sml = SmlDocument.Text;
-                        }
+                        SmlItems.RemoveAt(i);
                     }
                 }
+
                 SmlFileHelper.SaveToSml(FilePath, SmlItems.ToArray());
                 SaveHandler?.Invoke();
                 notificationService.ShowSuccess("Save success", nameof(SmlSendWindow));
